@@ -2,27 +2,27 @@ import { db } from "./db"
 import dateFormat from "dateformat";
 import { return_with_data, return_without_data } from "./constant";
 import bcrypt from "bcrypt";
-export class dbUser extends db{
+export class dbshowroom extends db{
     constructor() {
         super();
-        this.table = 'users';
+        this.table = 'showroom';
         this.uniqueField = 'id';
     }
 
     /**
      * User Sign up According to the given role
      */
-    async Signup(first_name:string, last_name:string, second_name:string, contact:number, address:string, role_id:string, password:string){
+    async ShowroomSignup(email:string, contact:number, address:string, role_id:string, showroom_name:string, areaid_id:number, password:string){
         //Hashed Password to overcome the data security of users
         let return_data:any = {...return_without_data}
         
         //check user exsist
 
-        let check_user = await this.getUser(0, {contact:contact})
+        let check_user = await this.getShowroomData(0, {contact:contact})
         
         if(check_user.error == false){
             return_data.error = true;
-            return_data.message = `User already exist try with different mobile`
+            return_data.message = `Showroom already exist try with different mobile`
             return return_data
         }
 
@@ -31,12 +31,12 @@ export class dbUser extends db{
         const createdOn = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
         const updatedOn = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
         let user_data = {
-            first_name:first_name,
-            last_name:last_name,
-            second_name:second_name,
+            email:email,
             contact:contact,
             address:address,
+            showroom_name:showroom_name,
             created_on:createdOn,
+            areaid_id:areaid_id,
             password:hashedpassword,
             updated_on: updatedOn       
         }
@@ -44,7 +44,7 @@ export class dbUser extends db{
             let user = await this.insertRecord(user_data)
             if(user){
                 return_data.error = false;
-                return_data.message = `User created successfully`
+                return_data.message = `Showroom created successfully`
                 return return_data
             }
         }catch(e){
@@ -57,13 +57,13 @@ export class dbUser extends db{
     /**
      * User Login according to the given contact no and password
      */
-    async Login(contact:string, password:string){
+    async ShowroomLogin(contact:string, password:string){
         let return_data:any = {...return_without_data}
-        let user_data:any = await this.getUser(0, {contact:contact})
+        let user_data:any = await this.getShowroomData(0, {contact:contact})
         //check user exsist
         if(user_data.error == true){
             return_data.error = true;
-            return_data.message = `User Not Found`
+            return_data.message = `Showroom Not Found`
             return return_data
         }
         
@@ -76,7 +76,7 @@ export class dbUser extends db{
         }
 
         return_data.error = false;
-        return_data.message = `User Login Successfully`
+        return_data.message = `Showroom Login Successfully`
         return_data.data = user_data.data
         return return_data
     }
@@ -84,20 +84,20 @@ export class dbUser extends db{
     /**
      * Common function to get user data
      */
-    async getUser(id:number = 0, where:any = {}){
+    async getShowroomData(id:number = 0, where:any = {}){
         let return_data:any = {...return_with_data}
         if(id){ 
             let user_data:any = await this.selectRecord(id,"*")
             
             if(user_data.length == 0){
                 return_data.error = true;
-                return_data.message = `User Not Found`
+                return_data.message = `Showroom Not Found`
                 // return_data.data = user_data[0]
                 return return_data
             }
 
             return_data.error = false;
-            return_data.message = `User Found`
+            return_data.message = `Showroom Found`
             return_data.data = user_data[0]
             return return_data
         }else{ // give all user data
@@ -110,12 +110,12 @@ export class dbUser extends db{
             
             if(user_data.length == 0){
                 return_data.error = true;
-                return_data.message = `No User Found`
+                return_data.message = `No Showroom Found`
                 return return_data
             }
 
             return_data.error = false;
-            return_data.message = `Total ${user_data.length} User Found`
+            return_data.message = `Total ${user_data.length} Showroom Found`
             return_data.data = user_data
             return return_data
         }
