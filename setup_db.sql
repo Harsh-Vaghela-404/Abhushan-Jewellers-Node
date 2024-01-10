@@ -14,20 +14,21 @@ CREATE TABLE public.users (
 CREATE TABLE showroom (
   id serial PRIMARY KEY,
   email VARCHAR(254) NOT NULL,
-  contact BIGINT NOT NULL,
+  contact VARCHAR(14) NOT NULL,
   address TEXT NOT NULL,
   showroom_name TEXT NOT NULL,
   password TEXT NOT NULL,
-  areaid_id BIGINT NOT NULL
+  area_id BIGINT NOT null,
+  created_on timestamp NOT NULL,
+  updated_on timestamp NOT null,
+  constraint fk_area foreign key(area_id) references area(id) on delete cascade
 );
 
 CREATE TABLE area (
   id serial PRIMARY KEY,
   areaname VARCHAR(30) NOT null,
-  showroom_id BIGINT not null,
   created_on timestamp default current_timestamp,
-  updated_on timestamp default current_timestamp,
-  constraint fk_showroom foreign key(showroom_id) references showroom(id) on delete cascade
+  updated_on timestamp default current_timestamp
 );
 
 CREATE TABLE booking (

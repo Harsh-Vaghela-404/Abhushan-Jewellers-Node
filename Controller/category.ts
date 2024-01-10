@@ -11,7 +11,7 @@ router.post("/getCategory", getCategory)
 module.exports = router
 async function createCategory(req:any, res:any) {
     let CategoryObj = new dbcategory()
-    let result = await CategoryObj.addCategory(req.body.category_name, req.body.user_id)
+    let result = await CategoryObj.addCategory(req.body.category_name, req.body.showroom_id)
     if(result.error){
         res.status(400).send(output(0, result.message));
     }else{

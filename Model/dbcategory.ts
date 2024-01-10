@@ -1,3 +1,4 @@
+import dateFormat from "dateformat";
 import { return_with_data, return_without_data } from "../Model/constant";
 // import { dbUser } from "../Model/dbuser";
 import { dbshowroom } from "../Model/dbshowroom";
@@ -16,6 +17,7 @@ export class dbcategory extends db{
         let ShowroomObj = new dbshowroom()
         
         let check_user:any = await ShowroomObj.getShowroomData(showroom_id)
+
         if(check_user.error){
             return_data.message = 'User Does Not Exist'
             return return_data
@@ -27,8 +29,11 @@ export class dbcategory extends db{
             return_data.message = 'Category Already Exist'
             return return_data
         }
-
-        let result = await this.insertRecord({categoryname:category_name, showroom_id:showroom_id});
+        
+        const createdOn = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
+        const updatedOn = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
+        
+        let result = await this.insertRecord({categoryname:category_name, showroom_id:showroom_id, created_on:createdOn, updated_on: updatedOn});
         if(!result){    
             return_data.message = 'Something Went wrong'
             return return_data
@@ -49,8 +54,9 @@ export class dbcategory extends db{
             return return_data
         }
 
+        const updatedOn = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
 
-        let result = await this.updateRecord(id,{categoryname:category_name});
+        let result = await this.updateRecord(id,{categoryname:category_name, updated_on:updatedOn});
         if(!result){
             return_data.message = 'Something Went wrong'
             return return_data

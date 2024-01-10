@@ -12,19 +12,19 @@ export class dbshowroom extends db{
     /**
      * User Sign up According to the given role
      */
-    async ShowroomSignup(email:string, contact:number, address:string, role_id:string, showroom_name:string, areaid_id:number, password:string){
+    async ShowroomSignup(email:string, contact:string, address:string, showroom_name:string, area_id:number, password:string){
         //Hashed Password to overcome the data security of users
         let return_data:any = {...return_without_data}
         
         //check user exsist
 
-        let check_user = await this.getShowroomData(0, {contact:contact})
+        let check_user = await this.getShowroomData(0, {contact:contact});
         
         if(check_user.error == false){
             return_data.error = true;
             return_data.message = `Showroom already exist try with different mobile`
             return return_data
-        }
+        }        
 
         const hashedpassword = await bcrypt.hash(password, 10)
 
@@ -36,10 +36,11 @@ export class dbshowroom extends db{
             address:address,
             showroom_name:showroom_name,
             created_on:createdOn,
-            areaid_id:areaid_id,
+            area_id:area_id,
             password:hashedpassword,
             updated_on: updatedOn       
         }
+        
         try{
             let user = await this.insertRecord(user_data)
             if(user){
@@ -87,19 +88,19 @@ export class dbshowroom extends db{
     async getShowroomData(id:number = 0, where:any = {}){
         let return_data:any = {...return_with_data}
         if(id){ 
-            let user_data:any = await this.selectRecord(id,"*")
+            let user_data:any = await this.selectRecord(id,"*");
             
             if(user_data.length == 0){
                 return_data.error = true;
                 return_data.message = `Showroom Not Found`
                 // return_data.data = user_data[0]
-                return return_data
+                return return_data;
             }
 
             return_data.error = false;
-            return_data.message = `Showroom Found`
-            return_data.data = user_data[0]
-            return return_data
+            return_data.message = `Showroom Found`;
+            return_data.data = user_data[0];
+            return return_data;
         }else{ // give all user data
 
             if(where){ // find user according to the condition
