@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { return_with_data, return_without_data } from "./constant";
+import { return_with_data, return_without_data } from "./functions";
 import dateFormat from "dateformat";
 
 export class dbarea extends db{

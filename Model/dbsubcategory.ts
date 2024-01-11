@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { return_with_data, return_without_data } from "./constant";
+import { return_with_data, return_without_data } from "./functions";
 import { dbshowroom } from "./dbshowroom";
 import dateFormat from "dateformat";
 export class dbsubcategory extends db{
@@ -11,6 +11,12 @@ export class dbsubcategory extends db{
 
     async createSubCategory(subcategoryname: string,category_id: number,showroom_id: number){
         let return_data = {...return_without_data}
+
+        let check_duplicate = await this.getSubCategory(0, subcategoryname, category_id, showroom_id);
+        if(!check_duplicate.error){
+            return_data.message = 'Subcategory Already Exist'
+            return return_data
+        }
 
         const createdOn = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
         const updatedOn = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss");
@@ -80,7 +86,7 @@ export class dbsubcategory extends db{
     
     }
 
-    async getSubCategory(id:number = 0, subcategoryname:string = '', showroom_id:number){
+    async getSubCategory(id:number = 0, subcategoryname:string = '', category_id:number = 0, showroom_id:number = 0){
         let return_data:any = {...return_with_data}
 
         let ShowroomObj = new dbshowroom()
@@ -96,13 +102,14 @@ export class dbsubcategory extends db{
             result = await this.selectRecord(id,"*")
         }else if(subcategoryname){
             this.where = `WHERE subcategoryname = '${subcategoryname}'`
-            if(showroom_id)
-                this.where += ` AND showroom_id = ${showroom_id}`
-            result = await this.allRecords("*")
+            if(showroom_id) this.where += ` AND showroom_id = ${showroom_id}`
+            if(category_id) this.where += ` AND category_id = ${category_id}`
+            
+            result = await this.allRecords("*");
         }else{
             result = await this.allRecords("*")
         }
-        if(!result){
+        if(!result.length){
             return_data.message = 'Something Went wrong'
             return return_data
         }

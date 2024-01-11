@@ -1,6 +1,6 @@
 import { db } from "./db"
 import dateFormat from "dateformat";
-import { return_with_data, return_without_data } from "./constant";
+import { return_with_data, return_without_data } from "./functions";
 import bcrypt from "bcrypt";
 export class dbUser extends db{
     constructor() {

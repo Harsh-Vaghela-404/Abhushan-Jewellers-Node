@@ -1,6 +1,6 @@
 import express from "express"
 import { dbcategory } from "../Model/dbcategory"
-import { output } from "../Model/constant"
+import { output } from "../Model/functions"
 const router = express.Router()
 
 router.post("/createCategory", createCategory)

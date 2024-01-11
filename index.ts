@@ -6,6 +6,7 @@ const categoryRoute = require('./Controller/category')
 const showroomRoute = require('./Controller/showroom')
 const areaRoute = require('./Controller/area')
 const subcategory = require('./Controller/subcategory')
+const productRoute = require('./Controller/product')
 
 // Documentation Link
 // https://documenter.getpostman.com/view/30940488/2s9YsM8WHm
@@ -21,6 +22,7 @@ app.use('/category', categoryRoute)
 app.use('/showroom', showroomRoute)
 app.use('/area', areaRoute)
 app.use('/subcategory', subcategory)
+app.use('/product', productRoute)
 
 app.listen(port, ()=>{
     console.log(`Server Connected on port ${port}`);

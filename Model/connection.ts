@@ -19,8 +19,9 @@ export class connection {
 	 * This function will connect DB with required DB credentials.
 	 */
 	async connect() {
+		const database = process.env.DATABASE_URL;
 		connection.connection = new Pool({
-			connectionString: process.env.DATABASE_URL
+			connectionString: database
 		});
 
 		try {

@@ -1,6 +1,6 @@
 import express from "express"
 import { dbsubcategory } from "../Model/dbsubcategory"
-import { output } from "../Model/constant"
+import { output } from "../Model/functions"
 const router = express.Router()
 
 router.post("/createSubcategory", createSubcategory)
