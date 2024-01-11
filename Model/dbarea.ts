@@ -44,6 +44,13 @@ export class dbarea extends db{
             "area": area,
             "updated_on": updatedOn
         }
+
+        let check_data:any = await this.getArea(id);
+        if(check_data.error){
+            return_data.message = "Area not found";
+            return return_data;
+        }
+
         let result = await this.updateRecord(id, areaData);
         if(!result){
             return_data.message = "Something went wrong";
@@ -58,7 +65,14 @@ export class dbarea extends db{
     async deleteArea(id:number){
         let return_data = {...return_without_data}
         
+        let check_data:any = await this.getArea(id);
+        if(check_data.error){
+            return_data.message = "Area not found";
+            return return_data;
+        }
+
         let result = await this.deleteRecord(id);
+
         if(!result){
             return_data.message = "Something went wrong";
             return return_data;
@@ -70,14 +84,15 @@ export class dbarea extends db{
 
     async getArea(id:number = 0, area:string = ''){
         let return_data = {...return_with_data}
-        let result:any = false
-        if(area){
-            this.where = "WHERE areaname = '"+ area +"'"
-            result = await this.allRecords("*")
-        }else if(id){
-            result = await this.selectRecord(id,"*")
+        let result:any = []
+        
+        if(id){
+            result = await this.selectRecord(id);
         }else{
-            result = await this.allRecords("*")
+            if(area){
+                this.where = " WHERE areaname = '"+ area +"'";
+            }
+            result = await this.allRecords("*");
         }
         if(result.length == 0){
             return_data.message = "Something went wrong";

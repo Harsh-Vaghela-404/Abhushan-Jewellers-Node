@@ -125,7 +125,7 @@ CREATE TABLE product (
   id serial PRIMARY KEY,
   product_name VARCHAR(100) NOT NULL,
   product_price VARCHAR(20) NOT NULL,
-  product_weight VARCHAR(50) NOT NULL,
+  product_weight float8 NOT NULL,
   product_small_desc VARCHAR(100) NOT NULL,
   product_large_desc VARCHAR(400) NOT NULL,
   product_small_img VARCHAR(100) NOT NULL,

@@ -35,7 +35,7 @@ async function getProduct(req:any,res:any) {
 
 async function deleteProduct(req:any, res:any) {
     const productObj = new dbproducts()
-    let result:any = await productObj.deleteProduct(req.body.id)
+    let result:any = await productObj.deleteProduct(req.body.id, req.body.showroom_id)
     if(result.error){
         res.status(400).send(output(0, result.message));
     }else{

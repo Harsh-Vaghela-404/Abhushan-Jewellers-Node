@@ -18,9 +18,9 @@ export class dbshowroom extends db{
         
         //check user exsist
 
-        let check_user = await this.getShowroomData(0, {contact:contact});
+        let showroom_data = await this.getShowroomData(0, contact);
         
-        if(check_user.error == false){
+        if(showroom_data.error == false){
             return_data.error = true;
             return_data.message = `Showroom already exist try with different mobile`
             return return_data
@@ -41,18 +41,14 @@ export class dbshowroom extends db{
             updated_on: updatedOn       
         }
         
-        try{
-            let user = await this.insertRecord(user_data)
-            if(user){
-                return_data.error = false;
-                return_data.message = `Showroom created successfully`
-                return return_data
-            }
-        }catch(e){
+        let user = await this.insertRecord(user_data)
+        if(!user){
             return_data.message = `Something went wrong`
-            return_data.error = true;
             return return_data; 
         }
+        return_data.error = false;
+        return_data.message = `Showroom created successfully`
+        return return_data;
     }
 
     /**
@@ -60,16 +56,18 @@ export class dbshowroom extends db{
      */
     async ShowroomLogin(contact:string, password:string){
         let return_data:any = {...return_without_data}
-        let user_data:any = await this.getShowroomData(0, {contact:contact})
+        
+        let showroom_data:any = await this.getShowroomData(0, contact)
+        
         //check user exsist
-        if(user_data.error == true){
+        if(showroom_data.error == true){
             return_data.error = true;
             return_data.message = `Showroom Not Found`
             return return_data
         }
         
         //Check password is correct or not
-        const isMatch = await bcrypt.compare(password, user_data.data[0].password)
+        const isMatch = await bcrypt.compare(password, showroom_data.data[0].password)
         if(!isMatch){
             return_data.error = true;
             return_data.message = `Password is incorrect`
@@ -78,47 +76,34 @@ export class dbshowroom extends db{
 
         return_data.error = false;
         return_data.message = `Showroom Login Successfully`
-        return_data.data = user_data.data
+        return_data.data = showroom_data.data
         return return_data
     }
 
     /**
      * Common function to get user data
      */
-    async getShowroomData(id:number = 0, where:any = {}){
+    async getShowroomData(id:number = 0, contact:string){
         let return_data:any = {...return_with_data}
+        let showroom_data:any = []
+        
         if(id){ 
-            let user_data:any = await this.selectRecord(id,"*");
-            
-            if(user_data.length == 0){
-                return_data.error = true;
-                return_data.message = `Showroom Not Found`
-                // return_data.data = user_data[0]
-                return return_data;
-            }
-
-            return_data.error = false;
-            return_data.message = `Showroom Found`;
-            return_data.data = user_data[0];
-            return return_data;
+            showroom_data = await this.selectRecord(id,"*");
         }else{ // give all user data
-
-            if(where){ // find user according to the condition
-                this.where = `WHERE ${Object.entries(where).map(([key, value]) => `${key} = '${value}'`).join(' AND ')};`
+            if(contact){
+                this.where += "WHERE contact = "+contact;
             }
+            let showroom_data:any = await this.allRecords("*")
+        }
 
-            let user_data:any = await this.allRecords("*")
-            
-            if(user_data.length == 0){
-                return_data.error = true;
-                return_data.message = `No Showroom Found`
-                return return_data
-            }
-
-            return_data.error = false;
-            return_data.message = `Total ${user_data.length} Showroom Found`
-            return_data.data = user_data
+        if(showroom_data.length == 0){
+            return_data.message = `No Showroom Found`
             return return_data
         }
+
+        return_data.error = false;
+        return_data.message = `Total ${showroom_data.length} Showroom Found`
+        return_data.data = showroom_data
+        return return_data
     }
 }
