@@ -1,13 +1,33 @@
 import express from "express"
 import { output } from "../Model/functions";
 import { dbproducts } from "../Model/dbproduct";
-import { upload, upload_image_S3 } from "../Model/functions";
+import { upload } from "../Model/functions";
+import Joi from "joi";
 const router = express.Router()
 module.exports = router;
 
-router.post("/addProduct", upload.fields([{ name: 'product_small_img', maxCount: 1 },{ name: 'product_img', maxCount: 1 }]), addProduct);
-router.post("/getProduct", getProduct);
-router.post("/deleteProduct", deleteProduct);
+router.post("/addProduct", addProductSchema, upload.fields([{ name: 'product_small_img', maxCount: 1 },{ name: 'product_img', maxCount: 1 }]), addProduct);
+router.post("/getProduct", getProductSchema, getProduct);
+router.post("/deleteProduct", deleteProductSchema, deleteProduct);
+
+function addProductSchema(req:any, res:any, next:any) {
+    let schema = Joi.object({
+        product_name: Joi.string().required(),
+        product_price: Joi.number().required(),
+        product_weight: Joi.number().required(),
+        product_small_desc: Joi.string().required(),
+        product_large_desc: Joi.string().required(),
+        category_id: Joi.number().required(),
+        subcategory_id: Joi.number().required(),
+        showroom_id: Joi.number().required()
+    })
+    const { error } = schema.validate(req.body)
+    if(error){
+        res.status(400).send(output(0, error.details[0].message));
+    }else{
+        next();
+    }
+}
 
 async function addProduct(req: any, res:any){
     const productObj = new dbproducts()
@@ -23,6 +43,22 @@ async function addProduct(req: any, res:any){
     }
 }
 
+function getProductSchema(req:any, res:any, next:any) {
+    let schema = Joi.object({
+        id: Joi.number(),
+        category_id: Joi.number(),
+        subcategory_id: Joi.number(),
+        showroom_id: Joi.number().required(),
+        product_name: Joi.string()
+    })
+    const { error } = schema.validate(req.body)
+    if(error){
+        res.status(400).send(output(0, error.message));
+    }else{
+        next();
+    }
+}
+
 async function getProduct(req:any,res:any) {
     const productObj = new dbproducts()
     let result:any = await productObj.getProduct(req.body.id, req.body.category_id, req.body.subcategory_id, req.body.showroom_id, req.body.product_name, true);
@@ -30,6 +66,19 @@ async function getProduct(req:any,res:any) {
         res.status(400).send(output(0, result.message));
     }else{
         res.status(200).send(output(1, result.message, result.data));
+    }
+}
+
+function deleteProductSchema(req:any, res:any, next:any) {
+    let schema = Joi.object({
+        id: Joi.number().required(),
+        showroom_id: Joi.number().required()
+    })
+    const { error } = schema.validate(req.body)
+    if(error){
+        res.status(400).send(output(0, error.message));
+    }else{
+        next();
     }
 }
 
