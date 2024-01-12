@@ -9,6 +9,7 @@ module.exports = router;
 router.post("/addProduct", addProductSchema, upload.fields([{ name: 'product_small_img', maxCount: 1 },{ name: 'product_img', maxCount: 1 }]), addProduct);
 router.post("/getProduct", getProductSchema, getProduct);
 router.post("/deleteProduct", deleteProductSchema, deleteProduct);
+router.post("/updateProduct", updateProductSchema, updateProduct);
 
 function addProductSchema(req:any, res:any, next:any) {
     let schema = Joi.object({
@@ -85,6 +86,39 @@ function deleteProductSchema(req:any, res:any, next:any) {
 async function deleteProduct(req:any, res:any) {
     const productObj = new dbproducts()
     let result:any = await productObj.deleteProduct(req.body.id, req.body.showroom_id)
+    if(result.error){
+        res.status(400).send(output(0, result.message));
+    }else{
+        res.status(200).send(output(1, result.message));
+    }
+}
+
+function updateProductSchema(req:any, res:any, next:any) {
+    let schema = Joi.object({
+        id: Joi.number().required(),
+        product_name: Joi.string(),
+        product_price: Joi.number(),
+        product_weight: Joi.number(),
+        product_small_desc: Joi.string(),
+        product_large_desc: Joi.string(),
+        category_id: Joi.number(),
+        subcategory_id: Joi.number(),
+        showroom_id: Joi.number().required()
+    })
+    const { error } = schema.validate(req.body)
+    if(error){
+        res.status(400).send(output(0, error.message));
+    }else{
+        next();
+    }
+}
+
+async function updateProduct(req:any, res:any) {
+    const productObj = new dbproducts()
+    const product_small_img = req.files['product_small_img'][0];
+    const product_img = req.files['product_img'][0];
+    req.body = JSON.parse(req.body.body);
+    let result:any = await productObj.updateProduct(req.body.id,req.body.product_name, req.body.product_price, req.body.product_weight, req.body.product_small_desc, req.body.product_large_desc, product_small_img, product_img, req.body.category_id, req.body.subcategory_id, req.body.showroom_id);
     if(result.error){
         res.status(400).send(output(0, result.message));
     }else{

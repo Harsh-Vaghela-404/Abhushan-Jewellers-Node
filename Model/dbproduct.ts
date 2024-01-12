@@ -132,6 +132,53 @@ export class dbproducts extends db{
         return return_data
     }
 
+    async updateProduct(id:number, product_name:string, product_price:string, product_weight:number, product_small_desc:string, product_large_desc:string, product_small_img:any, product_img:any, category_id:number, subcategory_id:number, showroom_id:number){
+        let return_data = {...return_without_data}
+
+        let old_data:any = await this.getProduct(id, 0, 0, 0, "", false);
+        if(old_data.error){
+            return_data.message = 'Product Does Not Exist'
+            return return_data
+        }
+        
+        let validate:any = await this.validate(showroom_id, id, true);
+        if(validate.error){
+            return_data.message = validate.message
+            return validate
+        }
+        const smallImageKey = randomImageName();
+        const largeImageKey = randomImageName();
+
+        let updateObj = {
+            product_name: product_name,
+            product_price: product_price,
+            product_weight: product_weight,
+            product_small_desc: product_small_desc,
+            product_large_desc: product_large_desc,
+            product_small_img: smallImageKey,
+            product_img: largeImageKey,
+            category_id: category_id,
+            subcategory_id: subcategory_id
+        }
+
+        let update_data = await this.updateRecord(id, updateObj);
+
+        if(!update_data){
+            return_data.message = 'Something Went wrong'
+            return return_data
+        }
+
+        await delete_image_s3(old_data.data[0].product_small_img);
+        await delete_image_s3(old_data.data[0].product_img);
+
+        await upload_image_S3(product_img.buffer, largeImageKey)
+        await upload_image_S3(product_small_img.buffer, smallImageKey)
+
+        return_data.message = 'Product Updated Successfully'
+        return_data.error = false
+        return return_data
+    }
+
     async validate(showroom_id:number, product_id:number, auth_valid:true | false= false){
         let return_data:any = {...return_without_data}
         
